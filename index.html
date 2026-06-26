@@ -1,0 +1,99 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>LendPeak — Website Conversion Tracking Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--green:#0FB97D;--green-d:#0a9e6a;--bg:#0c1322;--bg2:#0e1726;--card:#16213a;--line:#26344f;--text:#eaf1fb;--muted:#9fb1cc;--amber:#e8920c;--blue:#3d8bff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.62 'Inter',system-ui,Arial,sans-serif}
+.wrap{max-width:780px;margin:0 auto;padding:24px 18px 70px}
+h1{font-family:'Sora';font-size:23px;margin:0 0 4px}
+h2{font-family:'Sora';font-size:18px;margin:30px 0 8px;padding-top:12px;border-top:1px solid var(--line)}
+h3{font-family:'Sora';font-size:14.5px;margin:18px 0 6px;color:#cfe0f5}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 8px}
+header{background:linear-gradient(135deg,#0A2540,#103a66);border:1px solid var(--line);border-radius:14px;padding:20px}
+.pill{display:inline-block;background:rgba(15,185,125,.16);color:var(--green);font-weight:700;font-size:11.5px;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.step{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:8px;font-family:'Sora';font-size:12px;padding:3px 10px;color:#cfe0f5}
+.cb{position:relative;margin:10px 0 14px}
+.copy{position:absolute;top:8px;right:8px;background:var(--green);color:#04241a;border:0;font-family:'Sora';font-weight:700;font-size:12px;padding:6px 12px;border-radius:7px;cursor:pointer}
+.copy:hover{background:#13d28e}.copy.done{background:var(--green-d);color:#fff}
+pre{margin:0;padding:14px 16px;background:#0a1120;border:1px solid var(--line);border-radius:10px;white-space:pre-wrap;word-break:break-word;font:12.5px/1.6 ui-monospace,Menlo,monospace;color:#dce7f7}
+.note{border-left:3px solid var(--amber);background:rgba(232,146,12,.08);padding:11px 14px;border-radius:8px;margin:11px 0;font-size:13.6px}
+.note.g{border-left-color:var(--green);background:rgba(15,185,125,.08)}
+code{background:#0a1120;padding:1px 6px;border-radius:4px;font-size:12.5px}
+ol,ul{margin:6px 0;padding-left:20px}li{margin:6px 0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin:10px 0}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:24px 0 0;margin-top:24px;border-top:1px solid var(--line)}
+</style></head><body><div class="wrap">
+
+<header>
+<span class="pill">SETUP GUIDE · ~20 MIN · ONE-TIME</span>
+<h1>📈 LendPeak — Website Conversion Tracking</h1>
+<p class="sub">This lets Google Ads see which website leads turn into real customers, so it can find more of them. It's two small snippets for the <b>web team</b>, and almost nothing for the <b>CRM team</b>. Plain and simple below.</p>
+</header>
+
+<div class="note g"><b>How it works in one line:</b> the page tells Google "a lead came in" (using the person's email/phone as a private, hashed match key) → later, when that lead funds, LendPeak reports the sale back using the same email → Google learns which clicks make money. <b>No complex plumbing — email is the link.</b></div>
+
+<h2>For the web team — 2 snippets <span class="step">~15 min</span></h2>
+
+<h3>1 · Add the Google tag to every landing page</h3>
+<p class="sub">Paste this in the <code>&lt;head&gt;</code> of every page under <code>/lp/</code>. (LendPeak will send you the real <code>AW-XXXXXXXXX</code> ID to drop in — it appears twice.)</p>
+<div class="cb"><button class="copy" data-t="tag">Copy</button><pre id="tag">&lt;!-- Google tag (gtag.js) --&gt;
+&lt;script async src="https://www.googletagmanager.com/gtag/js?id=AW-XXXXXXXXX"&gt;&lt;/script&gt;
+&lt;script&gt;
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'AW-XXXXXXXXX');
+&lt;/script&gt;</pre></div>
+
+<h3>2 · Fire the "Lead" event when the form is submitted</h3>
+<p class="sub">Right after a lead is saved, call <code>reportLead()</code> with the email + phone the person typed. That email/phone is what lets Google match the lead later — it's hashed in the browser, so no raw personal data is sent. (LendPeak sends you the <code>send_to</code> value.)</p>
+<div class="cb"><button class="copy" data-t="lead">Copy</button><pre id="lead">&lt;script&gt;
+function reportLead(email, phone){
+  if (typeof gtag !== 'function') return;
+  // Enhanced Conversions — Google hashes these automatically
+  gtag('set', 'user_data', { email: email || '', phone_number: phone || '' });
+  gtag('event', 'conversion', {
+    send_to: 'AW-XXXXXXXXX/XXXXXXXXXXXXXXXX',   // LendPeak will send this
+    value: 1.0,
+    currency: 'USD'
+  });
+}
+// Example to call on a successful submit:
+// reportLead('jane@hershop.com', '+13105551234');
+&lt;/script&gt;</pre></div>
+<p class="sub"><b>Phone format:</b> send it as <code>+1XXXXXXXXXX</code> (country code, no spaces/dashes) when you can — it improves matching.</p>
+
+<div class="note"><b>Optional bonus (only if quick):</b> also save the click ID as a backup match key — add a hidden field and this one-liner to the form. Not required; email is the main link.
+<div class="cb" style="margin-top:8px"><button class="copy" data-t="gclid">Copy</button><pre id="gclid">&lt;input type="hidden" name="gclid" id="gclid"&gt;
+&lt;script&gt;var g=new URLSearchParams(location.search).get('gclid');if(g){document.getElementById('gclid').value=g;}&lt;/script&gt;</pre></div></div>
+
+<h2>For the CRM team (GoHighLevel) — almost nothing <span class="step">~2 min check</span></h2>
+<div class="box">Just confirm every lead record saves these (all standard fields you already collect — <b>no new automation to build</b>):
+<ul>
+<li><b>Email</b> and <b>Phone</b> of the lead</li>
+<li>The <b>funding amount</b> requested</li>
+<li>A clear <b>status/stage</b> that shows when a deal is <b>Funded</b></li>
+</ul>
+That's it — LendPeak handles reporting the funded deals back to Google from there. <span class="sub">(If LendPeak later requests a read-only API key to pull funded deals automatically, that would be the only extra ask — but it's optional.)</span></div>
+
+<h2>✅ Quick test (5 min)</h2>
+<ol>
+<li>Open a landing page and submit one test lead (use a fake phone like <code>(424) 555-0142</code> so no real line rings).</li>
+<li>In Google's <b>Tag Assistant</b>, confirm the <b>Lead</b> event fired on submit.</li>
+<li>Confirm the test lead appears in GoHighLevel with its email + phone.</li>
+<li>Tell LendPeak it's done — we delete the test and switch the campaign on.</li>
+</ol>
+
+<footer>LendPeak — website conversion tracking setup · for the LendPeak web &amp; CRM team</footer>
+</div>
+<script>
+(function(){
+function flash(b,ok){if(!b.dataset.o)b.dataset.o=b.textContent;b.textContent=ok?'Copied ✓':'Press Ctrl/⌘-C';b.classList.toggle('done',ok);setTimeout(function(){b.textContent=b.dataset.o;b.classList.remove('done')},1600);}
+function legacy(t,el){try{var ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();try{ta.setSelectionRange(0,t.length)}catch(e){}var ok=false;try{ok=document.execCommand('copy')}catch(e){ok=false}document.body.removeChild(ta);if(!ok&&el){try{var r=document.createRange();r.selectNodeContents(el);var s=window.getSelection();s.removeAllRanges();s.addRange(r)}catch(e){}}return ok;}catch(e){return false}}
+function go(b){var el=document.getElementById(b.dataset.t);if(!el){flash(b,false);return}var t=el.innerText;if(navigator.clipboard&&navigator.clipboard.writeText&&window.isSecureContext){navigator.clipboard.writeText(t).then(function(){flash(b,true)}).catch(function(){flash(b,legacy(t,el))})}else{flash(b,legacy(t,el))}}
+document.addEventListener('click',function(e){var b=e.target.closest('.copy');if(b)go(b)});
+})();
+</script></body></html>
