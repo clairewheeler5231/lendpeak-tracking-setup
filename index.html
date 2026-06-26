@@ -59,14 +59,10 @@ lendpeak.com/lp/<span class="hi">apply</span>
 &lt;input type="hidden" name="campaignid" id="campaignid"&gt;
 &lt;input type="hidden" name="adgroupid"  id="adgroupid"&gt;
 &lt;input type="hidden" name="keyword"    id="keyword"&gt;
-&lt;input type="hidden" name="matchtype"  id="matchtype"&gt;
-&lt;input type="hidden" name="device"     id="device"&gt;
-&lt;input type="hidden" name="network"    id="network"&gt;
-&lt;input type="hidden" name="creative"   id="creative"&gt;
 
 &lt;script&gt;
 (function(){
-  var keys=['gclid','campaignid','adgroupid','keyword','matchtype','device','network','creative'];
+  var keys=['gclid','campaignid','adgroupid','keyword'];
   var p=new URLSearchParams(location.search);
   keys.forEach(function(k){
     var v=p.get(k);
@@ -76,7 +72,7 @@ lendpeak.com/lp/<span class="hi">apply</span>
   });
 })();
 &lt;/script&gt;</pre></div>
-<div class="note">In GoHighLevel, create a <b>Custom Field</b> for each of these (<code>gclid</code>, <code>campaignid</code>, <code>adgroupid</code>, <code>keyword</code>, <code>matchtype</code>, <code>device</code>, <code>network</code>, <code>creative</code>) and map the matching hidden field to it, so they save on every lead. <code>gclid</code> is the must-have; the rest are valuable reporting.</div>
+<div class="note">In GoHighLevel, create a <b>Custom Field</b> for each of these four (<code>gclid</code>, <code>campaignid</code>, <code>adgroupid</code>, <code>keyword</code>) and map the matching hidden field to it, so they save on every lead.</div>
 
 <h2>3 · Fire the "Lead" event when the form is submitted</h2>
 <p class="sub">Call <code>reportLead(email, phone)</code> right after a lead is saved, passing the email + phone the person entered (Google hashes them in the browser — no raw data leaves). This is the conversion the campaign optimizes on.</p>
