@@ -81,7 +81,7 @@ function reportLead(email, phone){
   if (typeof gtag !== 'function') return;
   gtag('set', 'user_data', { email: email || '', phone_number: phone || '' });
   gtag('event', 'conversion', {
-    'send_to': 'AW-18139071660/LEAD_LABEL',   // &lt;-- LendPeak sends you this one value
+    'send_to': 'AW-18139071660/3PDGCNK69sUcEKyJsclD',
     'value': 1.0,
     'currency': 'USD'
   });
@@ -89,7 +89,7 @@ function reportLead(email, phone){
 // Example, on a successful submit:
 // reportLead('jane@hershop.com', '+13105551234');
 &lt;/script&gt;</pre></div>
-<div class="note"><b>One value to receive from LendPeak:</b> the <code>LEAD_LABEL</code> after the slash (the part before it, <code>AW-18139071660</code>, is already correct). LendPeak will send it — paste it in and you're done. Phone format <code>+1XXXXXXXXXX</code> when possible improves matching.</div>
+<div class="note">Phone format <code>+1XXXXXXXXXX</code> (country code, no spaces or dashes) when possible — it improves matching. Nothing to fill in; the tag values above are final.</div>
 
 <h2>✅ Test (5 min)</h2>
 <ol>
