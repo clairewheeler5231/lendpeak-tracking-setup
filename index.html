@@ -52,19 +52,31 @@ lendpeak.com/lp/<span class="hi">apply</span>
   gtag('config', 'AW-18139071660');
 &lt;/script&gt;</pre></div>
 
-<h2>2 · Capture the click ID (gclid) on the form</h2>
-<p class="sub">Add this hidden field inside the pre-qualify <code>&lt;form&gt;</code> and the small script on the page. It reads the <code>gclid</code> Google puts on the ad-click URL and saves it with the lead in GoHighLevel — this is what lets us tie a funded deal back to the exact click later. It survives multi-step forms.</p>
-<div class="cb"><button class="copy" data-t="gclid">Copy</button><pre id="gclid">&lt;!-- hidden field inside the &lt;form&gt; --&gt;
-&lt;input type="hidden" name="gclid" id="gclid"&gt;
+<h2>2 · Capture the click values (gclid + campaign data) on the form</h2>
+<p class="sub">LendPeak adds tracking values to the ad-click URL (the click ID plus which campaign / ad group / keyword / device drove it). Add these hidden fields inside the pre-qualify <code>&lt;form&gt;</code> and the script below — it reads those values from the URL and saves them with the lead in GoHighLevel. This is what lets us tie a funded deal back to the exact click and keyword later. It survives multi-step forms.</p>
+<div class="cb"><button class="copy" data-t="gclid">Copy</button><pre id="gclid">&lt;!-- hidden fields inside the &lt;form&gt; --&gt;
+&lt;input type="hidden" name="gclid"      id="gclid"&gt;
+&lt;input type="hidden" name="campaignid" id="campaignid"&gt;
+&lt;input type="hidden" name="adgroupid"  id="adgroupid"&gt;
+&lt;input type="hidden" name="keyword"    id="keyword"&gt;
+&lt;input type="hidden" name="matchtype"  id="matchtype"&gt;
+&lt;input type="hidden" name="device"     id="device"&gt;
+&lt;input type="hidden" name="network"    id="network"&gt;
+&lt;input type="hidden" name="creative"   id="creative"&gt;
 
 &lt;script&gt;
 (function(){
-  var g = new URLSearchParams(location.search).get('gclid');
-  if (g) { try { localStorage.setItem('lp_gclid', g); } catch(e){} }
-  var el = document.getElementById('gclid');
-  if (el) { try { el.value = g || localStorage.getItem('lp_gclid') || ''; } catch(e){ el.value = g || ''; } }
+  var keys=['gclid','campaignid','adgroupid','keyword','matchtype','device','network','creative'];
+  var p=new URLSearchParams(location.search);
+  keys.forEach(function(k){
+    var v=p.get(k);
+    if(v){ try{ localStorage.setItem('lp_'+k, v); }catch(e){} }   // remember across form steps
+    var el=document.getElementById(k);
+    if(el){ try{ el.value = v || localStorage.getItem('lp_'+k) || ''; }catch(e){ el.value = v||''; } }
+  });
 })();
 &lt;/script&gt;</pre></div>
+<div class="note">In GoHighLevel, create a <b>Custom Field</b> for each of these (<code>gclid</code>, <code>campaignid</code>, <code>adgroupid</code>, <code>keyword</code>, <code>matchtype</code>, <code>device</code>, <code>network</code>, <code>creative</code>) and map the matching hidden field to it, so they save on every lead. <code>gclid</code> is the must-have; the rest are valuable reporting.</div>
 
 <h2>3 · Fire the "Lead" event when the form is submitted</h2>
 <p class="sub">Call <code>reportLead(email, phone)</code> right after a lead is saved, passing the email + phone the person entered (Google hashes them in the browser — no raw data leaves). This is the conversion the campaign optimizes on.</p>
